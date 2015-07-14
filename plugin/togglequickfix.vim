@@ -1,4 +1,9 @@
 
+if exists('g:loaded_togglequickfix') || &cp
+    finish
+endif
+let g:loaded_togglequickfix = 1
+
 function! s:GetBufferList() 
   redir =>buflist 
   silent! ls 
