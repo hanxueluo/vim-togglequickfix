@@ -25,13 +25,22 @@ function! s:GetQuickFixBufferNumber()
   return [l:errBuf, l:locBuf]
 endfunction
 
+" 0:unmap, 1: map error list, 2:map location list
+let g:togglequickfix_key_map = 0
+
 function! s:MapQuickFixKey(isLocBuff)
     if a:isLocBuff
-        nmap <Leader>p :lprev<CR>
-        nmap <Leader>n :lnext<CR>
+        if g:togglequickfix_key_map != 2
+            nmap <silent> <Leader>p :lprev<CR>
+            nmap <silent> <Leader>n :lnext<CR>
+            let g:togglequickfix_key_map = 2
+        endif
     else
-        nmap <Leader>p :cprev<CR>
-        nmap <Leader>n :cnext<CR>
+        if g:togglequickfix_key_map != 1
+            nmap <silent> <Leader>p :cprev<CR>
+            nmap <silent> <Leader>n :cnext<CR>
+            let g:togglequickfix_key_map = 1
+        endif
     endif
 endfunction
 
@@ -70,5 +79,6 @@ function! s:ToggleQuickFixWin()
     endif
 endfunction
 
-"call s:ToggleQuickFixWin()
+"TODO: update the key map when user execute "lopen" or "copen" manually.
+call <SID>MapQuickFixKey(0)
 nmap <script> <silent> <leader>q :call <SID>ToggleQuickFixWin()<CR>
