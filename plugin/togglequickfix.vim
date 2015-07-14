@@ -25,6 +25,16 @@ function! s:GetQuickFixBufferNumber()
   return [l:errBuf, l:locBuf]
 endfunction
 
+function! s:MapQuickFixKey(isLocBuff)
+    if a:isLocBuff
+        nmap <Leader>p :lprev<CR>
+        nmap <Leader>n :lnext<CR>
+    else
+        nmap <Leader>p :cprev<CR>
+        nmap <Leader>n :cnext<CR>
+    endif
+endfunction
+
 function! s:ToggleQuickFixWin()
     let l:listBuf = s:GetQuickFixBufferNumber()
     let l:errBuf = l:listBuf[0]
@@ -34,15 +44,20 @@ function! s:ToggleQuickFixWin()
     if l:errBuf > 0 && l:locBuf == 0
         cclose
         if len(getloclist(l:curWin)) > 0
+            call s:MapQuickFixKey(1)
             lopen
         endif
     elseif l:errBuf > 0 && l:locBuf > 0
         cclose
     elseif l:errBuf == 0 && l:locBuf == 0
         if len(getqflist()) > 0
+            call s:MapQuickFixKey(0)
             copen
         elseif len(getloclist(l:curWin)) > 0
+            call s:MapQuickFixKey(1)
             lopen
+        else
+            echo "No Quickfix"
         endif
     elseif l:errBuf == 0 && l:locBuf > 0
         lclose
@@ -50,10 +65,10 @@ function! s:ToggleQuickFixWin()
 
     "windo echo winnr().bufname('%')
     if l:curWin != winnr()
-        exec curWin."wincmd w"
+        exec "wincmd p"
+        "exec curWin."wincmd w"
     endif
 endfunction
 
 "call s:ToggleQuickFixWin()
 nmap <script> <silent> <leader>q :call <SID>ToggleQuickFixWin()<CR>
-
